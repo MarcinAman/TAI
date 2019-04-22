@@ -20,3 +20,5 @@ libraryDependencies += "org.sangria-graphql" %% "sangria" % "1.4.2"
 libraryDependencies += "org.sangria-graphql" %% "sangria-play-json" % "1.0.5"
 libraryDependencies += "org.typelevel" %% "cats-core" % "1.6.0"
 libraryDependencies += "com.softwaremill.quicklens" %% "quicklens" % "1.4.12"
+libraryDependencies += ws
+libraryDependencies += ehcache
