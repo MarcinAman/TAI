@@ -1,6 +1,6 @@
 package models
 
-import akka.http.scaladsl.model.DateTime
+import org.joda.time.DateTime
 
 case class CurrencyPeriod(currency: Currency, from: DateTime, to: DateTime)
 

@@ -1,6 +1,9 @@
 package controllers
 
+import akka.stream.Materializer
+import akka.stream.scaladsl.Sink
 import javax.inject._
+import models.TableA
 import org.mongodb.scala.bson.collection.mutable.Document
 import org.mongodb.scala.{Completed, Observer}
 import play.api.Configuration
@@ -8,6 +11,7 @@ import play.api.http.HttpErrorHandler
 import play.api.mvc._
 import repositories.PictureRepository
 import services.GraphQLService
+import services.impl.NBPCurrencyService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -23,8 +27,9 @@ class FrontendController @Inject()(
   config: Configuration,
   cc: ControllerComponents,
   graphQLService: GraphQLService,
-  pictureRepository: PictureRepository
-) extends AbstractController(cc) {
+  pictureRepository: PictureRepository,
+  currencyService: NBPCurrencyService
+)(implicit val materializer: Materializer) extends AbstractController(cc) {
 
   def index: Action[AnyContent] = assets.at("index.html")
 
@@ -40,5 +45,17 @@ class FrontendController @Inject()(
 
   def mongoTest = Action.async {
     pictureRepository.findFirst().head().map(d => Ok(d.toJson()))
+  }
+
+  def fetchLatestExchangeRatesA() = Action.async{
+    currencyService.fetchLatestExchangeRates(Some(TableA)).runWith(Sink.head).map(e => Ok(e.toString))
+  }
+
+  def fetchLatestExchangeRatesB() = Action.async {
+    currencyService.fetchLatestExchangeRates().runWith(Sink.head).map(e => Ok(e.toString))
+  }
+
+  def fetchCurrencyList() = Action.async {
+    currencyService.fetchCurrencyList().runWith(Sink.seq).map(e => Ok(e.toString))
   }
 }
