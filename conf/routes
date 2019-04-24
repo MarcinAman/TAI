@@ -12,7 +12,8 @@ GET    /mongoTest                   controllers.FrontendController.mongoTest
 GET     /fetchLatestExchangeRatesA   controllers.FrontendController.fetchLatestExchangeRatesA()
 GET     /fetchLatestExchangeRatesB   controllers.FrontendController.fetchLatestExchangeRatesB()
 
-GET     /fetchCurrencyList   controllers.FrontendController.fetchCurrencyList()
+GET     /fetchCurrencyList           controllers.FrontendController.fetchCurrencyList()
+GET     /fetchCurrencyDataFromPeriod   controllers.FrontendController.fetchCurrencyDataFromPeriod()
 
 # An example route (Prefix all API routes with apiPrefix defined in application.conf)
 GET     /api/summary                controllers.HomeController.appSummary

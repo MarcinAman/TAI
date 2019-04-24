@@ -3,9 +3,9 @@ package controllers
 import akka.stream.Materializer
 import akka.stream.scaladsl.Sink
 import javax.inject._
-import models.TableA
-import org.mongodb.scala.bson.collection.mutable.Document
-import org.mongodb.scala.{Completed, Observer}
+import models.{Currency, CurrencyPeriod, TableA}
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 import play.api.Configuration
 import play.api.http.HttpErrorHandler
 import play.api.mvc._
@@ -57,5 +57,13 @@ class FrontendController @Inject()(
 
   def fetchCurrencyList() = Action.async {
     currencyService.fetchCurrencyList().runWith(Sink.seq).map(e => Ok(e.toString))
+  }
+
+  def fetchCurrencyDataFromPeriod() = Action.async {
+    val dateFormat = "yyyy-MM-dd"
+    val from = DateTime.parse("2018-01-24", DateTimeFormat.forPattern(dateFormat))
+    val endDate = DateTime.parse("2019-01-10", DateTimeFormat.forPattern(dateFormat))
+
+    currencyService.fetchCurrencyDataFromPeriod(CurrencyPeriod(Currency("funt", "gbp"), from, endDate)).runWith(Sink.seq).map(e => Ok(e.toString))
   }
 }

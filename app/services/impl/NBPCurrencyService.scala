@@ -1,7 +1,5 @@
 package services.impl
 
-import java.text.SimpleDateFormat
-
 import akka.NotUsed
 import akka.stream.scaladsl.Source
 import javax.inject.Inject
@@ -11,9 +9,12 @@ import play.api.libs.json._
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import services.CurrencyService
 
-class NBPCurrencyService @Inject() (ws: WSClient) extends CurrencyService {
+class NBPCurrencyService @Inject()(ws: WSClient) extends CurrencyService {
   override def fetchLatestExchangeRates(table: Option[CurrencyTable]): Source[LatestExchangeRates, NotUsed] =
-    table.fold(latestCurrencyRateFromTable(TableA).merge(latestCurrencyRateFromTable(TableB)))(tb => latestCurrencyRateFromTable(tb))
+    table.fold(
+      latestCurrencyRateFromTable(TableA)
+        .merge(latestCurrencyRateFromTable(TableB))
+    )(latestCurrencyRateFromTable)
 
   override def fetchCurrencyList(): Source[Currency, NotUsed] =
     fetchLatestExchangeRates()
@@ -27,7 +28,7 @@ class NBPCurrencyService @Inject() (ws: WSClient) extends CurrencyService {
   private def fetchCurrencyByPeriod(period: CurrencyPeriod): Source[CurrencyPeriodData, NotUsed] = {
     val rqs: WSRequest = request(periodExchangeURL(period))
 
-    singleGetRequest(rqs).map(_.json).map(parseCurrencyPeriodData)
+    singleGetRequest(rqs).map(_.json).map(e => parseCurrencyPeriodData(e, period))
   }
 
   private def latestCurrencyRateFromTable(table: CurrencyTable): Source[LatestExchangeRates, NotUsed] = {
@@ -38,8 +39,8 @@ class NBPCurrencyService @Inject() (ws: WSClient) extends CurrencyService {
 
   private def parseResponseToLatestExchangeRates(value: JsValue): LatestExchangeRates = {
     val latestExchange = value.validate[Seq[LatestExchangeDTO]] match {
-      case s : JsSuccess[Seq[LatestExchangeDTO]] => s.get.head
-      case e : JsError => throw new RuntimeException(s"Failed to validate JSON: ${e.errors}")
+      case s: JsSuccess[Seq[LatestExchangeDTO]] => s.get.head
+      case e: JsError => throw new RuntimeException(s"Failed to validate JSON: ${e.errors}")
     }
 
     val latestRates = latestExchange.rates.map(e => {
@@ -50,14 +51,25 @@ class NBPCurrencyService @Inject() (ws: WSClient) extends CurrencyService {
     LatestExchangeRates(latestExchange.no, latestExchange.effectiveDate, latestRates)
   }
 
-  private def parseCurrencyPeriodData(value: JsValue): CurrencyPeriodData = ???
+  private def parseCurrencyPeriodData(value: JsValue, currencyPeriod: CurrencyPeriod): CurrencyPeriodData = {
+    val currencyPeriodData = value.validate[CurrencyPeriodDataDTO] match {
+      case s: JsSuccess[CurrencyPeriodDataDTO] => s.get
+      case e: JsError => throw new RuntimeException(s"Failed to validate JSON: ${e.errors}")
+    }
+
+    val currencyDailyRates = currencyPeriodData.rates.map {
+      e => DailyExchangeRates(e.no, e.effectiveDate, e.mid)
+    }
+
+    CurrencyPeriodData(currencyPeriod, currencyDailyRates)
+  }
 
   private def exchangesURL(table: CurrencyTable): String = s"http://api.nbp.pl/api/exchangerates/tables/${table.code}?format=json"
 
   private def periodExchangeURL(currencyPeriod: CurrencyPeriod): String = {
-    val formatter = new SimpleDateFormat("yyyy-MM-dd")
+    val format = "yyyy-MM-dd"
 
-    s"http://api.nbp.pl/api/exchangerates/rates/a/${currencyPeriod.currency.code}/${formatter.format(currencyPeriod.from)}/${formatter.format(currencyPeriod.to)}/?format=json"
+    s"http://api.nbp.pl/api/exchangerates/rates/a/${currencyPeriod.currency.code}/${currencyPeriod.from.toString(format)}/${currencyPeriod.to.toString(format)}/?format=json"
   }
 
   def splitPeriodByMaxTime(currencyPeriod: CurrencyPeriod, maxPeriodInDays: Int = 92): Seq[CurrencyPeriod] = {
@@ -68,22 +80,30 @@ class NBPCurrencyService @Inject() (ws: WSClient) extends CurrencyService {
 
     val (acc, e) = (0 until fullPeriods).foldLeft(
       (List.empty[CurrencyPeriod], currencyPeriod.from)
-    )((acc, _) => {
-      val (accumulated,  beginning) = acc
+    )((acc, i) => {
+      val (accumulated, beginning) = acc
 
-      val probableEnd = beginning.plusDays(maxPeriodInDays)
+      val updatedBeginning = if (i == 0) beginning else beginning plusDays 1
+      val end = updatedBeginning.plusDays(maxPeriodInDays)
 
-      (CurrencyPeriod(currencyPeriod.currency, beginning, probableEnd) :: accumulated, probableEnd plusDays 1)
+      (CurrencyPeriod(currencyPeriod.currency, updatedBeginning, end) :: accumulated, end)
     })
 
-    CurrencyPeriod(currencyPeriod.currency, e, e plusDays remain) :: acc
+    if (remain != 0) {
+      val additionDueToPreviousDates = if (fullPeriods == 0) 0 else 1
+      CurrencyPeriod(currencyPeriod.currency, e plusDays additionDueToPreviousDates, currencyPeriod.to) :: acc
+    } else {
+      acc
+    }
   }
 
   private def request(url: String): WSRequest = ws.url(url)
     .addHttpHeaders("Accept" -> "application/json")
 
-  private def singleGetRequest(request: WSRequest): Source[WSResponse, NotUsed] =
-    Source.fromFuture{
+  private def singleGetRequest(request: WSRequest): Source[WSResponse, NotUsed] = {
+    println("Performing request: " + request)
+    Source.fromFuture {
       request.get()
     }
+  }
 }
