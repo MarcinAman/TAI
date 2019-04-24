@@ -68,20 +68,15 @@ class NBPCurrencyService @Inject() (ws: WSClient) extends CurrencyService {
 
     val (acc, e) = (0 until fullPeriods).foldLeft(
       (List.empty[CurrencyPeriod], currencyPeriod.from)
-    )((acc, i) => {
+    )((acc, _) => {
       val (accumulated,  beginning) = acc
 
-      val end = beginning.plusDays(maxPeriodInDays)
-      val additional = if (i == fullPeriods - 1) 0 else 1
+      val probableEnd = beginning.plusDays(maxPeriodInDays)
 
-      (CurrencyPeriod(currencyPeriod.currency, beginning, end) :: accumulated, end plusDays additional)
+      (CurrencyPeriod(currencyPeriod.currency, beginning, probableEnd) :: accumulated, probableEnd plusDays 1)
     })
 
-    if(remain != 0){
-      CurrencyPeriod(currencyPeriod.currency, e, e plusDays remain) :: acc
-    } else {
-      acc
-    }
+    CurrencyPeriod(currencyPeriod.currency, e, e plusDays remain) :: acc
   }
 
   private def request(url: String): WSRequest = ws.url(url)
@@ -89,5 +84,6 @@ class NBPCurrencyService @Inject() (ws: WSClient) extends CurrencyService {
 
   private def singleGetRequest(request: WSRequest): Source[WSResponse, NotUsed] =
     Source.fromFuture{
-      request.get() }
+      request.get()
+    }
 }
