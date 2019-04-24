@@ -22,3 +22,4 @@ libraryDependencies += "org.typelevel" %% "cats-core" % "1.6.0"
 libraryDependencies += "com.softwaremill.quicklens" %% "quicklens" % "1.4.12"
 libraryDependencies += ws
 libraryDependencies += ehcache
+libraryDependencies += "org.mockito" % "mockito-core" % "2.27.0"

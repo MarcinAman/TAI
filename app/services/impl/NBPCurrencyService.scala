@@ -6,7 +6,7 @@ import akka.NotUsed
 import akka.stream.scaladsl.Source
 import javax.inject.Inject
 import models._
-import org.joda.time.Period
+import org.joda.time.Days
 import play.api.libs.json._
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 import services.CurrencyService
@@ -60,28 +60,23 @@ class NBPCurrencyService @Inject() (ws: WSClient) extends CurrencyService {
     s"http://api.nbp.pl/api/exchangerates/rates/a/${currencyPeriod.currency.code}/${formatter.format(currencyPeriod.from)}/${formatter.format(currencyPeriod.to)}/?format=json"
   }
 
-  // TODO dear god this is shit
-  private def splitPeriodByMaxTime(currencyPeriod: CurrencyPeriod, maxPeriodInDays: Int = 93): Seq[CurrencyPeriod] = {
-    val periodInDays = new Period(currencyPeriod.from, currencyPeriod.to).getDays
+  def splitPeriodByMaxTime(currencyPeriod: CurrencyPeriod, maxPeriodInDays: Int = 92): Seq[CurrencyPeriod] = {
+    val periodInDays = Days.daysBetween(currencyPeriod.from, currencyPeriod.to).getDays
 
-    val x = (periodInDays.floatValue() / periodInDays.floatValue()).ceil.toInt
+    val remain = periodInDays % maxPeriodInDays
+    val fullPeriods = periodInDays / maxPeriodInDays
 
-    var periods = List.empty[CurrencyPeriod]
-    var begining = currencyPeriod.from
-    for (_ <- 0 until x){
-      val beg = begining
-      val end = beg.plusDays(maxPeriodInDays)
+    val (acc, e) = (0 until fullPeriods).foldLeft(
+      (List.empty[CurrencyPeriod], currencyPeriod.from)
+    )((acc, _) => {
+      val (accumulated,  beginning) = acc
 
-      if(end.isAfter(currencyPeriod.to)){
-        periods = CurrencyPeriod(currencyPeriod.currency, beg, currencyPeriod.to) :: periods
-        begining = currencyPeriod.to
-      } else {
-        periods = CurrencyPeriod(currencyPeriod.currency, beg, end) :: periods
-        begining = end
-      }
-    }
+      val probableEnd = beginning.plusDays(maxPeriodInDays)
 
-    periods
+      (CurrencyPeriod(currencyPeriod.currency, beginning, probableEnd) :: accumulated, probableEnd plusDays 1)
+    })
+
+    CurrencyPeriod(currencyPeriod.currency, e, e plusDays remain) :: acc
   }
 
   private def request(url: String): WSRequest = ws.url(url)
