@@ -1,17 +1,10 @@
 package models
-
-sealed trait CurrencyTable {
-  def code: String
-}
-
-case object TableA extends CurrencyTable {
-  def code = "A"
-}
-case object TableB extends CurrencyTable {
-  def code = "B"
-}
-case object TableC extends CurrencyTable {
-  def code = "C"
-}
+import sangria.macros.derive._
+import sangria.schema.ObjectType
 
 case class Currency(currencyName: String, code: String)
+
+object Currency {
+  val CurrencyType: ObjectType[Unit, Currency] =
+    deriveObjectType[Unit, Currency]()
+}
