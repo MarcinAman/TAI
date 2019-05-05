@@ -7,7 +7,6 @@
 # compiled output
 /ui/dist
 /ui/tmp
-/ui/**/*.js
 /ui/**/*.js.map
 
 # dependencies

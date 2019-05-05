@@ -2,8 +2,6 @@ package controllers
 
 import akka.stream.Materializer
 import javax.inject._
-import models.{Currency, CurrencyPeriod, CurrencyPeriodData, DailyExchangeRates}
-import org.joda.time.DateTime
 import play.api.Configuration
 import play.api.http.HttpErrorHandler
 import play.api.mvc._
@@ -33,39 +31,6 @@ class FrontendController @Inject()(
   }
 
   def graphQL = Action.async(parse.json)  { request =>
-    val x = currencyRateRegressionService.calculateRegression(
-      CurrencyPeriodData(
-        CurrencyPeriod(
-          Currency("PLN", "PLN"),
-          DateTime.now().minusDays(4),
-          DateTime.now()
-        ),
-        Seq(
-          DailyExchangeRates(
-            DateTime.now().minusDays(4),
-            BigDecimal(4)
-          ),
-          DailyExchangeRates(
-            DateTime.now().minusDays(3),
-            BigDecimal(3)
-          ),
-          DailyExchangeRates(
-            DateTime.now().minusDays(2),
-            BigDecimal(2)
-          ),
-          DailyExchangeRates(
-            DateTime.now().minusDays(1),
-            BigDecimal(1)
-          ),
-          DailyExchangeRates(
-            DateTime.now().minusDays(0),
-            BigDecimal(0)
-          )
-        )
-      )
-    )
-    print(x)
-
     graphQLService.graphQLEndpoint(request)
   }
 }

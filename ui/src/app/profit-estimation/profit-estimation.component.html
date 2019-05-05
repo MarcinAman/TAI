@@ -1,0 +1,56 @@
+<div>
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <h1>Profit estimation</h1>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div *ngIf="calculatedProfit">
+        <div>
+          <label class="form-control-label">Latest estimation: </label>
+          <div>
+            <label class="form-control-label">Profit before tax: </label>
+            <span>{{calculatedProfit.profitPreTax}}</span>
+            <br>
+            <label class="form-control-label">Profit after tax: </label>
+            <span>{{calculatedProfit.profitPostTax}}</span>
+          </div>
+        </div>
+      </div>
+
+
+      <div>
+        <label class="form-control-label">Currency: </label>
+        <select class="form-control" required [(ngModel)]="profitEstimationData.currency" name="currency">
+          <option *ngFor="let curr of availableCurrencies"
+                  [ngValue]="curr">{{ curr.code + " " + curr.currencyName }} </option>
+        </select>
+        <br>
+
+        <label class="form-control-label">Starting date: </label>
+        <mat-form-field style="width: 100%">
+          <input matInput required [min]="minDate" [matDatepicker]="pickerFrom"
+                 placeholder="Choose a date" [(ngModel)]="profitEstimationData.dateFrom">
+          <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFrom></mat-datepicker>
+        </mat-form-field>
+
+        <label class="form-control-label">Ending date: </label>
+        <mat-form-field style="width: 100%">
+          <input matInput required [min]="minDate" [matDatepicker]="pickerTo"
+                 placeholder="Choose a date" [(ngModel)]="profitEstimationData.dateTo">
+          <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+          <mat-datepicker #pickerTo></mat-datepicker>
+        </mat-form-field>
+
+        <label class="form-control-label">Tax percentage:</label>
+        <input type="number" class="form-control" style="width: 100%;" placeholder="Provide tax percentage" [min]="0"
+               [max]="100" [(ngModel)]="profitEstimationData.taxPercentage" [defaultValue]="0"/>
+      </div>
+      <br>
+      <button class="btn btn-primary" (click)="calculateProfit()">Calculate</button>
+    </div>
+  </div>
+</div>
