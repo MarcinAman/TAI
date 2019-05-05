@@ -2,8 +2,6 @@ package controllers
 
 import akka.stream.Materializer
 import javax.inject._
-import models.{Currency, CurrencyPeriod, CurrencyPeriodData, DailyExchangeRates}
-import org.joda.time.DateTime
 import play.api.Configuration
 import play.api.http.HttpErrorHandler
 import play.api.mvc._

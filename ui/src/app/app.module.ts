@@ -8,10 +8,12 @@ import { AppHttpInterceptorService } from './http-interceptor.service';
 import { ROUTES } from './app.routes';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { FormsModule }   from '@angular/forms';
+import {ProfitEstimationModule} from './profit-estimation/profit-estimation.module';
+import {MatNativeDateModule} from '@angular/material';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,
@@ -23,14 +25,17 @@ import { FormsModule }   from '@angular/forms';
     NgbModule,
     RouterModule.forRoot(ROUTES),
     DashboardModule,
-    FormsModule
+    FormsModule,
+    ProfitEstimationModule,
+    MatNativeDateModule
   ],
   providers: [
     {
       multi: true,
       provide: HTTP_INTERCEPTORS,
       useClass: AppHttpInterceptorService
-    }
+    },
+    MatNativeDateModule
   ],
   bootstrap: [AppComponent]
 })

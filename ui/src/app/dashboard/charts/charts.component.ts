@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CurrenciesService} from '../../currencies.service';
 
 @Component({
@@ -14,10 +14,11 @@ export class ChartsComponent implements OnInit {
 
   constructor(
     private currenciesService: CurrenciesService
-  ) { }
+  ) {
+  }
 
   ngOnInit() {
-    this.currenciesService.getCurrencies().subscribe( v => this.availableCurrencies = v)
+    this.currenciesService.getCurrencies().subscribe(v => this.availableCurrencies = v.data.currencies.map(e => e.code))
   }
 
   addChart() {
