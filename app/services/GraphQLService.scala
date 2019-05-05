@@ -14,7 +14,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 
-class GraphQLService @Inject() (val currencyService: CurrencyService) {
+class GraphQLService @Inject() (val currencyService: QueryService) {
 
   def graphQLEndpoint(request: Request[JsValue]): Future[Result] = {
     val query = (request.body \ "query").as[String]
@@ -45,9 +45,9 @@ class GraphQLService @Inject() (val currencyService: CurrencyService) {
   private def executeGraphQLQuery(query: Document, op: Option[String], vars: Option[JsObject]): Future[Result] ={
 
     val executed = vars.map {
-      v => Executor.execute(CurrencyService.schema, query, currencyService , operationName = op, variables = v)
+      v => Executor.execute(QueryService.schema, query, currencyService , operationName = op, variables = v)
     }.getOrElse{
-      Executor.execute(CurrencyService.schema, query, currencyService , operationName = op)
+      Executor.execute(QueryService.schema, query, currencyService , operationName = op)
     }
 
     executed.map(Ok(_))

@@ -20,7 +20,7 @@ class CurrencyRateRegressionService @Inject() (sparkService: SparkService){
     val ratesDS = TypedDataset.create(periodData.rates.map(r =>{
       val period = new Duration(r.date, periodData.currencyPeriod.to)
       val x = Currency(period.getStandardDays.toDouble, r.bid.toDouble)
-      println(x)
+//      println(x)
       x
     }))
 
@@ -29,9 +29,13 @@ class CurrencyRateRegressionService @Inject() (sparkService: SparkService){
 
     case class CurrencyWithFeatures(date: Double, rate: Double, features: Vector)
     val dataWithFeatures = assembler.transform(ratesDS).as[CurrencyWithFeatures]
+//  dataWithFeatures.select(dataWithFeatures.col('date), dataWithFeatures.col('features)).collect.run().map(x=>
+//    println(x)
+//  )
+
 
     case class LRInputs(date: Double, features: Vector)
-    val rf = TypedLinearRegression[LRInputs]
+    val rf = TypedLinearRegression[LRInputs].setMaxIter(1000).setElasticNetParam(0.8).setRegParam(0.3)
 
     val model = rf.fit(dataWithFeatures).run()
 

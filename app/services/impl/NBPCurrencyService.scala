@@ -7,21 +7,20 @@ import models._
 import org.joda.time.Days
 import play.api.libs.json._
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
-import services.CurrencyService
 
-class NBPCurrencyService @Inject()(ws: WSClient) extends CurrencyService {
-  override def fetchLatestExchangeRates(table: Option[CurrencyTable]): Source[LatestExchangeRates, NotUsed] =
+class NBPCurrencyService @Inject()(ws: WSClient) {
+  def fetchLatestExchangeRates(table: Option[CurrencyTable]): Source[LatestExchangeRates, NotUsed] =
     table.fold(
       latestCurrencyRateFromTable(TableA)
         .merge(latestCurrencyRateFromTable(TableB))
     )(latestCurrencyRateFromTable)
 
-  override def fetchCurrencyList(): Source[Currency, NotUsed] =
-    fetchLatestExchangeRates()
+  def fetchCurrencyList(): Source[Currency, NotUsed] =
+    fetchLatestExchangeRates(None)
       .flatMapConcat(e => Source.fromIterator(() => e.rates.iterator))
       .map(e => e.currency)
 
-  override def fetchCurrencyDataFromPeriod(period: CurrencyPeriod): Source[CurrencyPeriodData, NotUsed] = {
+  def fetchCurrencyDataFromPeriod(period: CurrencyPeriod): Source[CurrencyPeriodData, NotUsed] = {
     Source.fromIterator(() => splitPeriodByMaxTime(period).iterator).flatMapConcat(fetchCurrencyByPeriod)
   }
 
