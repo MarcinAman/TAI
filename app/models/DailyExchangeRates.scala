@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 import sangria.macros.derive._
 import sangria.schema.{ObjectType, ScalarType}
 
-case class DailyExchangeRates(ID: String, date: DateTime, bid: BigDecimal)
+case class DailyExchangeRates(date: DateTime, bid: BigDecimal)
 
 object DailyExchangeRates {
   implicit val dt: ScalarType[DateTime] = DateConverter.DateTimeType

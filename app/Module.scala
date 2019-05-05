@@ -1,7 +1,7 @@
 import com.google.inject.AbstractModule
 import play.api.libs.ws.ahc.AhcWSClient
 import services.impl.NBPCurrencyService
-import services.{Actors, CurrencyService, DatabaseService}
+import services.{Actors, CurrencyService, DatabaseService, SparkService}
 
 /**
  * This class is a Guice module that tells Guice how to bind several
@@ -21,6 +21,8 @@ class Module extends AbstractModule {
 
     bind(classOf[DatabaseService]).asEagerSingleton()
     bind(classOf[CurrencyService]).toInstance(new NBPCurrencyService(ws))
+    bind(classOf[SparkService]).asEagerSingleton()
+
   }
 
 }

@@ -58,7 +58,7 @@ class NBPCurrencyService @Inject()(ws: WSClient) extends CurrencyService {
     }
 
     val currencyDailyRates = currencyPeriodData.rates.map {
-      e => DailyExchangeRates(e.no, e.effectiveDate, e.mid)
+      e => DailyExchangeRates(e.effectiveDate, e.mid)
     }
 
     CurrencyPeriodData(currencyPeriod, currencyDailyRates)
