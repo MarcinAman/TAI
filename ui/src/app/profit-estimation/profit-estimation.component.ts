@@ -25,7 +25,7 @@ export class ProfitEstimationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.currenciesService.getCurrencies()
+    this.currenciesService.getCurrencyCodes()
       .subscribe(e => {
         this.availableCurrencies = e.data.currencies;
       })
