@@ -16,7 +16,7 @@ Fetching latest rates:
 Fetching data from period:
 ```json
 {
-	"query": "query sample($code: String!,$from: DateTime!, $to: DateTime!){ currencyFromPeriod(code: $code, from: $from, to: $to) { currencyPeriod { from to currency { currencyName code } } rates { ID date bid } } }",
+	"query": "query sample($code: String!,$from: DateTime!, $to: DateTime!){ currencyFromPeriod(code: $code, from: $from, to: $to) { currencyPeriod { from to currency { currencyName code } } rates { date bid } } }",
 	"variables": {
 		"code" : "USD",
 		"from" : "2019-03-15T00:00:00", 
