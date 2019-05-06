@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  http_endpoint: "http://localhost:9000/graphQL"
 };

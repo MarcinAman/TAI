@@ -8,9 +8,9 @@ import {CurrenciesService} from '../../currencies.service';
 })
 export class ChartsComponent implements OnInit {
 
-  private availableCurrencies: string[];
-  private newCurrency: string;
-  private charts: any[];
+  public availableCurrencies: string[];
+  public newCurrency: string;
+  public charts: any[];
 
   constructor(
     private currenciesService: CurrenciesService
