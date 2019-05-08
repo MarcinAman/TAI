@@ -7,3 +7,14 @@ services:
       - "27017:27017"
     environment:
       - MONGO_INITDB_DATABASE=TAIdb
+  backend:
+    container_name: backend
+    image: tai:1
+    ports:
+      - 9000:9000 #http
+      - 9443:9443 #https
+  frontend:
+    container_name: frontend
+    image: tai-frontend:1
+    ports:
+      - 80:80
