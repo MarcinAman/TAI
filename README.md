@@ -25,3 +25,22 @@ Fetching data from period:
 }
 ```
 
+### Building docker images:
+Backend:
+```bash
+./buildDockerBackend.sh 
+```
+
+Frontend:
+```bash
+cd ui
+./buildDockerFrontend.sh
+```
+
+Running:
+```bash
+docker-compose -f ./conf/docker-compose up
+```
+
+Application is hosted by default on 80 port
+
