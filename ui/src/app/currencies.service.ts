@@ -13,12 +13,22 @@ export class CurrenciesService {
   constructor(private httpClient: HttpClient) {
   }
 
-  getCurrencies(): Observable<GraphQLResponse<Currencies>> {
-
+  getCurrencyCodes(): Observable<GraphQLResponse<Currencies>> {
     const body = {
       query: "query { currencies { currencyName code } }"
     };
+    return this.httpClient.post<GraphQLResponse<Currencies>>(this.httpEndpoint, body)
+  }
 
+  getRatesFromPeriod(code: string, from: Date, to: Date): Observable<GraphQLResponse<any>>{
+    const body = {
+      query: "query sample($code: String!,$from: DateTime!, $to: DateTime!){ currencyFromPeriod(code: $code, from: $from, to: $to) { currencyPeriod { from to currency { currencyName code } } rates { date bid } } }",
+      variables: {
+        code : code,
+        from : from,
+        to: to
+      }
+    };
     return this.httpClient.post<GraphQLResponse<Currencies>>(this.httpEndpoint, body)
   }
 }

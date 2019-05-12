@@ -10,10 +10,12 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { FormsModule }   from '@angular/forms';
 import {ProfitEstimationModule} from './profit-estimation/profit-estimation.module';
 import {MatNativeDateModule} from '@angular/material';
+import { ChartsModule } from 'ng2-charts';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [
-    AppComponent,
+    AppComponent
   ],
   imports: [
     BrowserModule,
@@ -26,8 +28,10 @@ import {MatNativeDateModule} from '@angular/material';
     RouterModule.forRoot(ROUTES),
     DashboardModule,
     FormsModule,
+    ChartsModule,
     ProfitEstimationModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    DragDropModule
   ],
   providers: [
     {

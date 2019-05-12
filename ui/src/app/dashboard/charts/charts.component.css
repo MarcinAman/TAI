@@ -1,0 +1,7 @@
+.chart-list {
+  display: block;
+}
+.chart-item {
+  max-height: 50%;
+  max-width: 50%;
+}
