@@ -12,10 +12,10 @@
           <label class="form-control-label">Latest estimation: </label>
           <div>
             <label class="form-control-label">Profit before tax: </label>
-            <span>{{calculatedProfit.profitPreTax}}</span>
+            <span>{{calculatedProfit.profitPreTax.toFixed(2)}} zl</span>
             <br>
             <label class="form-control-label">Profit after tax: </label>
-            <span>{{calculatedProfit.profitPostTax}}</span>
+            <span>{{calculatedProfit.profitPostTax.toFixed(2)}} zl</span>
           </div>
         </div>
       </div>
@@ -48,6 +48,10 @@
         <label class="form-control-label">Tax percentage:</label>
         <input type="number" class="form-control" style="width: 100%;" placeholder="Provide tax percentage" [min]="0"
                [max]="100" [(ngModel)]="profitEstimationData.taxPercentage" [defaultValue]="0"/>
+        <br>
+        <label class="form-control-label">Amount:</label>
+        <input type="number" class="form-control" style="width: 100%;" placeholder="Provide amount of currency you want to buy" [min]="1"
+               [(ngModel)]="profitEstimationData.amount" [defaultValue]="1"/>
       </div>
       <br>
       <button class="btn btn-primary" (click)="calculateProfit()">Calculate</button>

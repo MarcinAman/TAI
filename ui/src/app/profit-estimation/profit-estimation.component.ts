@@ -32,6 +32,8 @@ export class ProfitEstimationComponent implements OnInit {
   }
 
   calculateProfit() {
-    this.profitEstimationService.estimateProfit(this.profitEstimationData).subscribe(e => this.calculatedProfit = e.data)
+    this.profitEstimationService.estimateProfit(this.profitEstimationData).subscribe(e => {
+      this.calculatedProfit = e.data.estimateProfit;
+    })
   }
 }

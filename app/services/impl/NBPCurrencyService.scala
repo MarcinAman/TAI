@@ -9,14 +9,11 @@ import play.api.libs.json._
 import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
 
 class NBPCurrencyService @Inject()(ws: WSClient) {
-  def fetchLatestExchangeRates(table: Option[CurrencyTable]): Source[LatestExchangeRates, NotUsed] =
-    table.fold(
-      latestCurrencyRateFromTable(TableA)
-        .merge(latestCurrencyRateFromTable(TableB))
-    )(latestCurrencyRateFromTable)
+  def fetchLatestExchangeRates(): Source[LatestExchangeRates, NotUsed] =
+    latestCurrencyRateFromTable(TableA)
 
   def fetchCurrencyList(): Source[Currency, NotUsed] =
-    fetchLatestExchangeRates(None)
+    fetchLatestExchangeRates()
       .flatMapConcat(e => Source.fromIterator(() => e.rates.iterator))
       .map(e => e.currency)
 

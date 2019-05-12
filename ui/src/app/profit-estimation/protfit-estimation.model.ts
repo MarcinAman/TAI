@@ -5,8 +5,13 @@ export class ProfitEstimationRequestData {
     public currency?: Currency,
     public dateFrom?: Date,
     public dateTo?: Date,
-    public taxPercentage?: number
+    public taxPercentage?: number,
+    public amount?: number
   ){ }
+}
+
+export interface ProfitEstimationResponse {
+  estimateProfit: ProfitEstimationResponseData
 }
 
 export interface ProfitEstimationResponseData {

@@ -2,53 +2,47 @@ package services
 
 
 import javax.inject.Inject
-import frameless._
-import frameless.syntax._
-import frameless.ml._
-import frameless.ml.feature._
-import frameless.ml.regression._
 import models.{CurrencyPeriodData, DailyExchangeRates}
-import org.apache.spark.ml.linalg.Vector
-import org.joda.time.{DateTime, Duration}
+import org.apache.spark.mllib.linalg.Vectors
+import org.apache.spark.mllib.regression.{LabeledPoint, LinearRegressionWithSGD}
+import org.joda.time.Duration
 
 class CurrencyRateRegressionService @Inject() (sparkService: SparkService){
   import sparkService._
-  import spark.implicits._
 
   def calculateRegression(periodData: CurrencyPeriodData): CurrencyPeriodData = {
-    case class Currency(date: Double, rate: Double)
-    val ratesDS = TypedDataset.create(periodData.rates.map(r =>{
+    // x -> date (features) y -> value (label)
+
+    val ratesDS = spark.sparkContext.parallelize(periodData.rates.map(r =>{
       val period = new Duration(r.date, periodData.currencyPeriod.to)
-      val x = Currency(period.getStandardDays.toDouble, r.bid.toDouble)
-//      println(x)
-      x
+      println(r.bid.toDouble, period.getStandardDays.toDouble)
+      LabeledPoint(r.bid.toDouble, Vectors.dense(period.getStandardDays.toDouble))
     }))
 
-    case class Features(rate: Double)
-    val assembler = TypedVectorAssembler[Features]
 
-    case class CurrencyWithFeatures(date: Double, rate: Double, features: Vector)
-    val dataWithFeatures = assembler.transform(ratesDS).as[CurrencyWithFeatures]
-//  dataWithFeatures.select(dataWithFeatures.col('date), dataWithFeatures.col('features)).collect.run().map(x=>
-//    println(x)
-//  )
+    val numIterations = 10000
+    val stepSize = 0.00000001
+    val model = LinearRegressionWithSGD.train(ratesDS, numIterations, stepSize)
+
+    //label (y or the independent variable, meaning the observed end result y)
+    // and the prediction (the estimation based on the regression formula determined by the SDG algorithm)
+    val valuesAndPreds = ratesDS.map { point =>
+      val prediction = model.predict(point.features)
+      (point.label, prediction)
+    }
+
+    valuesAndPreds.foreach(result => println(s"predicted label: ${result._2}, actual label: ${result._1}"))
+
+    val MSE = valuesAndPreds.map{ case(v, p) => math.pow( v - p, 2) }.mean()
+    println("training Mean Squared Error = " + MSE)
 
 
-    case class LRInputs(date: Double, features: Vector)
-    val rf = TypedLinearRegression[LRInputs].setMaxIter(1000).setElasticNetParam(0.8).setRegParam(0.3)
-
-    val model = rf.fit(dataWithFeatures).run()
-
-    case class Result(date: Double, rate: Double, features: Vector, result: Double)
-    val resultDS = model.transform(dataWithFeatures).as[Result]
-
-    val result = resultDS.select(resultDS.col('date), resultDS.col('result)).collect.run()
-
-    periodData.copy(rates = result.map(r =>
-        DailyExchangeRates(
-          periodData.currencyPeriod.to.minusDays(r._1.asInstanceOf[Double].toInt), BigDecimal(r._2.asInstanceOf[Double])
-        )
+    periodData.copy(rates = valuesAndPreds.map(r =>
+      DailyExchangeRates(
+        periodData.currencyPeriod.to.minusDays(r._1.toInt), BigDecimal(r._2)
       )
+    ).collect()
     )
   }
 }
+
