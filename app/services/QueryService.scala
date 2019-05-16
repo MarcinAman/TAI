@@ -1,7 +1,6 @@
 package services
 
-import akka.NotUsed
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.Sink
 import javax.inject.Inject
 import models._
 import org.joda.time.DateTime
@@ -12,7 +11,8 @@ import scala.concurrent.Future
 
 class QueryService @Inject() (
   val currencyRateRegressionService: CurrencyRateRegressionService,
-  val nBPCurrencyService: NBPCurrencyService
+  val nBPCurrencyService: NBPCurrencyService,
+  val profitEstimationService: ProfitEstimationService
 ) {}
 
 object QueryService {
@@ -27,7 +27,7 @@ object QueryService {
 
     Field("exchanges", ListType(LatestExchangeRates.LatestExchangeRatesType),
       description = Some("Returns latest exchange rates"),
-      resolve = _.ctx.nBPCurrencyService.fetchLatestExchangeRates(None).runWith(Sink.seq).map(_.toList)
+      resolve = _.ctx.nBPCurrencyService.fetchLatestExchangeRates().runWith(Sink.seq).map(_.toList)
     ),
 
     Field("currencyFromPeriod", CurrencyPeriodData.CurrencyPeriodDataType,
@@ -60,7 +60,28 @@ object QueryService {
           .runWith(Sink.head)
         x
       }
-    )
+    ),
+    Field("estimateProfit", ProfitEstimationResponse.ProfitEstimationResponseDataType,
+      description = Some("Returns estimated profit from a given period of time"),
+      arguments = List(
+        Argument("code", StringType),
+        Argument("from", DateConverter.DateTimeType),
+        Argument("to", DateConverter.DateTimeType),
+        Argument("tax", IntType),
+        Argument("amount", IntType)
+      ),
+      resolve = e => {
+        val request = ProfitEstimationRequest(
+          e.arg[String]("code"),
+          e.arg[DateTime]("from"),
+          e.arg[DateTime]("to"),
+          e.arg[Int]("tax"),
+          e.arg[Int]("amount")
+        )
+
+        val x: Future[ProfitEstimationResponse] = e.ctx.profitEstimationService.calculateProfit(request).runWith(Sink.head)
+        x
+      })
   ))
 
   val schema = Schema(QueryType)
