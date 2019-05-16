@@ -10,11 +10,9 @@ import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
   styleUrls: ['./charts.component.css']
 })
 export class ChartsComponent implements OnInit {
-
-
-  private currencies: any[];
-  private newCurrency: string;
-  private charts: Chart[] = [];
+  public currencies: any[];
+  public newCurrency: string;
+  public charts: Chart[] = [];
 
   private readonly options: ChartOptions = {
     elements: {

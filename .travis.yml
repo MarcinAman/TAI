@@ -1,0 +1,29 @@
+os:
+  - linux
+language: scala
+node_js:
+  - "10.13.0"
+jdk:
+  - oraclejdk8
+sudo: false
+env:
+  global:
+    - NODE_VERSION=10.13.0
+before_install:
+  - jdk_switcher use oraclejdk8
+  - java -version
+  - nvm install $NODE_VERSION
+  - node -v
+  - npm -v
+  - npm install -g @angular/cli
+install:
+  - cd ui && npm install
+script:
+  - ng build --prod
+  - cd .. && sbt dist
+  - sbt test
+notifications:
+  webhooks:
+    on_success: never  # options: [always|never|change] default: always
+    on_failure: never  # options: [always|never|change] default: always
+    on_start:   false  # default: false
