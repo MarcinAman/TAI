@@ -13,31 +13,51 @@
           <option *ngFor="let curr of currencies" [value]="curr.code">{{curr.code + " " + curr.currencyName}} </option>
         </select>
       </div>
-        <button class=" col-1 btn btn-primary" (click)="addChart()">Add</button>
+      <button class=" col-1 btn btn-primary" (click)="addChart()">Add</button>
     </div>
 
     <br>
 
     <div class="row chart-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
-        <div *ngFor="let chart of charts; let i = index" class="col-12" cdkDrag>
-          <div class="input-group mb-3">
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button" (click)="deleteChart(i)">
-                <i class="far fa-trash-alt "></i>
-              </button>
-            </div>
-            <input type="text" class="form-control uneditable-textarea border-0" value="{{chart.currencyName}}">
+      <div *ngFor="let chart of charts; let i = index" class="col-12" cdkDrag>
+        <div class="input-group mb-3">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" (click)="deleteChart(i)">
+              <i class="far fa-trash-alt "></i>
+            </button>
           </div>
+          <input type="text" class="form-control uneditable-textarea border-0" value="{{chart.currencyName}}">
+        </div>
 
 
-          <div class="row ">
-            <canvas baseChart
-                    [data]="chart.data"
-                    [options]="chart.options"
-                    [chartType]="chart.type"
-                    [legend]="false">
-            </canvas>
+        <div class="row ">
+          <canvas baseChart
+                  [data]="chart.data"
+                  [options]="chart.options"
+                  [chartType]="chart.type"
+                  [legend]="false">
+          </canvas>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div *ngIf="user">
+        <label class="form-control-label">Authenticated as: </label>
+        <div>
+          <img src="{{ user.photoUrl }}">
+          <div>
+            <h4>{{ user.name }}</h4>
+            <p>{{ user.email }}</p>
           </div>
+        </div>
+      </div>
+
+      <div *ngIf="!user">
+        <label class="form-control-label">Sign in with google: </label>
+        <button (click)="signInWithGoogle()"><span class="fab fa-google"></span></button>
+      </div>
+      <div *ngIf="user">
+        <button class="btn btn-danger" (click)="signOut()">Sign out</button>
       </div>
     </div>
 
