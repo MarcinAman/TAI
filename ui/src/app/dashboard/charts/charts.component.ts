@@ -3,7 +3,6 @@ import {CurrenciesService} from '../../currencies.service';
 import {Chart} from './chart';
 import {ChartOptions} from 'chart.js';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
-import {AuthService, GoogleLoginProvider, SocialUser} from 'angularx-social-login';
 
 @Component({
   selector: 'app-charts',
@@ -14,7 +13,6 @@ export class ChartsComponent implements OnInit {
   public currencies: any[];
   public newCurrency: string;
   public charts: Chart[] = [];
-  public user: SocialUser;
 
   private readonly options: ChartOptions = {
     elements: {
@@ -41,13 +39,10 @@ export class ChartsComponent implements OnInit {
   };
 
 
-  constructor(private currenciesService: CurrenciesService, private authService: AuthService) {}
+  constructor(private currenciesService: CurrenciesService) {}
 
   ngOnInit() {
     this.currenciesService.getCurrencyCodes().subscribe(v => this.currencies = v.data.currencies);
-    this.authService.authState.subscribe((user) => {
-      this.user = user;
-    });
   }
 
   addChart() {
@@ -80,13 +75,5 @@ export class ChartsComponent implements OnInit {
 
   onDrop(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.charts, event.previousIndex, event.currentIndex);
-  }
-
-  signInWithGoogle(): void {
-    this.authService.signIn(GoogleLoginProvider.PROVIDER_ID);
-  }
-
-  signOut(): void {
-    this.authService.signOut();
   }
 }

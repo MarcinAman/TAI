@@ -11,6 +11,23 @@
       <a class="nav-link" routerLink="/profit-estimation" routerLinkActive="active">Profit estimation</a>
     </li>
   </ul>
+  <ul class="navbar-nav ml-auto">
+    <li class="nav-item" *ngIf="user">
+        <label class="nav-link">{{ user.name }}</label>
+    </li>
+    <li class="nav-item" *ngIf="user">
+        <img src="{{ user.photoUrl }}" class="navbar-brand" width="50" height="50">
+    </li>
+    <li *ngIf="user">
+      <button class="btn btn-danger" (click)="signOut()">Sign out</button>
+    </li>
+    <li *ngIf="!user" class="nav-item">
+        <label class="nav-link">Sign in with google: </label>
+    </li>
+    <li *ngIf="!user">
+        <button (click)="signInWithGoogle()"><span class="fab fa-google"></span></button>
+    </li>
+  </ul>
 </nav>
 <div class="container-fluid">
   <div class="card jh-card">

@@ -40,26 +40,5 @@
         </div>
       </div>
     </div>
-    <div>
-      <div *ngIf="user">
-        <label class="form-control-label">Authenticated as: </label>
-        <div>
-          <img src="{{ user.photoUrl }}">
-          <div>
-            <h4>{{ user.name }}</h4>
-            <p>{{ user.email }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div *ngIf="!user">
-        <label class="form-control-label">Sign in with google: </label>
-        <button (click)="signInWithGoogle()"><span class="fab fa-google"></span></button>
-      </div>
-      <div *ngIf="user">
-        <button class="btn btn-danger" (click)="signOut()">Sign out</button>
-      </div>
-    </div>
-
   </div>
 </div>
