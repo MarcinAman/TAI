@@ -12,6 +12,28 @@ import {ProfitEstimationModule} from './profit-estimation/profit-estimation.modu
 import {MatNativeDateModule} from '@angular/material';
 import { ChartsModule } from 'ng2-charts';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import {
+  AuthServiceConfig,
+  GoogleLoginProvider,
+  LoginOpt,
+  SocialLoginModule
+} from 'angularx-social-login';
+
+const googleLoginOptions: LoginOpt = {
+  scope: 'profile email'
+}; // https://developers.google.com/api-client-library/javascript/reference/referencedocs#gapiauth2clientconfig
+
+
+let config = new AuthServiceConfig([
+  {
+    id: GoogleLoginProvider.PROVIDER_ID,
+    provider: new GoogleLoginProvider('624796833023-clhjgupm0pu6vgga7k5i5bsfp6qp6egh.apps.googleusercontent.com', googleLoginOptions)
+  }
+]);
+
+export function provideConfig() {
+  return config;
+}
 
 @NgModule({
   declarations: [
@@ -31,7 +53,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     ChartsModule,
     ProfitEstimationModule,
     MatNativeDateModule,
-    DragDropModule
+    DragDropModule,
+    SocialLoginModule
   ],
   providers: [
     {
@@ -39,7 +62,11 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
       provide: HTTP_INTERCEPTORS,
       useClass: AppHttpInterceptorService
     },
-    MatNativeDateModule
+    MatNativeDateModule,
+    {
+      provide: AuthServiceConfig,
+      useFactory: provideConfig
+    }
   ],
   bootstrap: [AppComponent]
 })

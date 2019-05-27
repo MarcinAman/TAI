@@ -42,7 +42,7 @@ export class ChartsComponent implements OnInit {
   constructor(private currenciesService: CurrenciesService) {}
 
   ngOnInit() {
-    this.currenciesService.getCurrencyCodes().subscribe(v => this.currencies = v.data.currencies)
+    this.currenciesService.getCurrencyCodes().subscribe(v => this.currencies = v.data.currencies);
   }
 
   addChart() {

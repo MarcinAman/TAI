@@ -16,7 +16,7 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
     FormsModule,
     RouterModule.forChild(DASHBOARD_ROUTES),
     ChartsModule,
-    DragDropModule
+    DragDropModule,
   ]
 })
 export class DashboardModule {}
