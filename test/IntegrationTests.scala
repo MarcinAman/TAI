@@ -12,7 +12,8 @@ class IntegrationTests extends FlatSpec with Matchers with WebBrowser {
   val driver = new ChromeDriver(DesiredCapabilities.chrome())
   val host = "http://localhost:4200/"
 
-  "Adding to dashboard" should "be possible" in {
+//  "Adding to dashboard"
+  ignore should "be possible" in {
     driver.get(host)
     driver.findElement(By.linkText("Dashboard")).click()
 
@@ -35,7 +36,8 @@ class IntegrationTests extends FlatSpec with Matchers with WebBrowser {
   }
 
 
-  "Estimating profit" should "be possible" in {
+//  "Estimating profit"
+  ignore should "be possible" in {
     driver.get(host)
     driver.findElement(By.linkText("Profit estimation")).click()
 
