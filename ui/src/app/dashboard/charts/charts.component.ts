@@ -3,6 +3,7 @@ import {CurrenciesService} from '../../currencies.service';
 import {Chart} from './chart';
 import {ChartOptions} from 'chart.js';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import {UserService} from "../../user.service";
 
 @Component({
   selector: 'app-charts',
@@ -39,10 +40,38 @@ export class ChartsComponent implements OnInit {
   };
 
 
-  constructor(private currenciesService: CurrenciesService) {}
+  constructor(
+    private currenciesService: CurrenciesService,
+    private userService: UserService,
+  ) {}
 
-  ngOnInit() {
-    this.currenciesService.getCurrencyCodes().subscribe(v => this.currencies = v.data.currencies);
+  async ngOnInit() {
+    const currenciesRaw  = await this.currenciesService.getCurrencyCodes().toPromise();
+    this.currencies = currenciesRaw.data.currencies
+    if (this.userService.currentUser) {
+      this.userService.currentUser.dashboardCurrencies.map(dbCurrency => {
+        const from = new Date();
+        from.setDate(from.getDate() - 30);
+        // From last 30 days
+        const name = this.currencies.find(value => value.code === dbCurrency);
+        this.currenciesService.getRatesFromPeriod(name.code, from, new Date())
+          .subscribe(v => {
+            const data = v.data.currencyFromPeriod.rates.map(x => {
+              return {
+                x: Date.parse(x.date),
+                y: x.bid
+              }
+            });
+            this.charts.push({
+              type: "line",
+              data: data,
+              options: this.options,
+              currencyName: name.code + " " + name.currencyName,
+              currencyCode: name.code
+            });
+          });
+      });
+    }
   }
 
   addChart() {
@@ -62,15 +91,19 @@ export class ChartsComponent implements OnInit {
         type: "line",
         data: data,
         options: this.options,
-        currencyName: name.code + " " + name.currencyName
-      })
-      //TODO save in database
+        currencyName: name.code + " " + name.currencyName,
+        currencyCode: name.code
+      });
+      console.log("AS1", this.userService.currentUser)
+      this.userService.currentUser.dashboardCurrencies.push(name.code.toString());
+      this.userService.saveUser(this.userService.currentUser).subscribe(() => {})
     });
   }
 
   deleteChart(index : number){
     this.charts.splice(index, 1);
-    //TODO update in database
+    this.userService.currentUser.dashboardCurrencies.splice(index, 1);
+    this.userService.saveUser(this.userService.currentUser).subscribe(() => {})
   }
 
   onDrop(event: CdkDragDrop<string[]>) {

@@ -4,5 +4,6 @@ export interface Chart {
   type: ChartType,
   data: any[],
   options: ChartOptions,
-  currencyName: string
+  currencyName: string,
+  currencyCode: string
 }

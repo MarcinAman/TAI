@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs'
-import {Currencies, Currency, GraphQLResponse} from './app.model';
+import {Currencies, GraphQLResponse} from './app.model';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../environments/environment';
 
