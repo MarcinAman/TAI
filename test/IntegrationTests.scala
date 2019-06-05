@@ -5,15 +5,15 @@ import org.openqa.selenium.chrome.ChromeDriver
 import org.scalatest.selenium.WebBrowser
 import org.openqa.selenium.remote.DesiredCapabilities
 
+case class IntegrationFixture(
+  driver: ChromeDriver,
+  host: String
+)
 
 class IntegrationTests extends FlatSpec with Matchers with WebBrowser {
-  System.setProperty("webdriver.chrome.driver", "conf/chromedriver74")
 
-  val driver = new ChromeDriver(DesiredCapabilities.chrome())
-  val host = "http://localhost:4200/"
-
-//  "Adding to dashboard"
-  ignore should "be possible" in {
+  ignore should "add to dashboard" in fixture {fx =>
+    import fx._
     driver.get(host)
     driver.findElement(By.linkText("Dashboard")).click()
 
@@ -36,8 +36,9 @@ class IntegrationTests extends FlatSpec with Matchers with WebBrowser {
   }
 
 
-//  "Estimating profit"
-  ignore should "be possible" in {
+  ignore should "estimate profit" in fixture { fx =>
+    import fx._
+
     driver.get(host)
     driver.findElement(By.linkText("Profit estimation")).click()
 
@@ -54,5 +55,13 @@ class IntegrationTests extends FlatSpec with Matchers with WebBrowser {
     Thread.sleep(1000)
     val elements = driver.findElements(By.xpath("/html/body/app-root/div/div/app-profit-estimation/div/div[2]/div/div[1]/div/div"))
     elements.size() shouldEqual 1
+  }
+
+  def fixture (action: IntegrationFixture => Unit): Any = {
+    System.setProperty("webdriver.chrome.driver", "conf/chromedriver74")
+    val driver = new ChromeDriver(DesiredCapabilities.chrome())
+    val host = "http://localhost:4200/"
+
+    action(IntegrationFixture(driver, host))
   }
 }
