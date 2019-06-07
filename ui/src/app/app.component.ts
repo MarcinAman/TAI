@@ -19,7 +19,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.authService.authState.pipe(operators.flatMap((user) => {
-        console.log("XD2, ", user)
         this.user = user;
       if(user) {
         this.userService.currentUser = {
@@ -34,14 +33,12 @@ export class AppComponent implements OnInit {
       }
     })
     ).subscribe( x => {
-      console.log("XD3", x)
       this.userService.currentUser = x.data.saveIfNotExistsUser})
 
   }
 
   signInWithGoogle(): void {
     Observable.from(this.authService.signIn(GoogleLoginProvider.PROVIDER_ID)).pipe(operators.flatMap((user) => {
-      console.log("XD, ", user)
         this.user = user;
         if(user) {
           this.userService.currentUser = {
