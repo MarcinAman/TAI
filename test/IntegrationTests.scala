@@ -12,7 +12,7 @@ case class IntegrationFixture(
 
 class IntegrationTests extends FlatSpec with Matchers with WebBrowser {
 
-  ignore should "add to dashboard" in fixture {fx =>
+  it should "add to dashboard" in fixture {fx =>
     import fx._
     driver.get(host)
     driver.findElement(By.linkText("Dashboard")).click()
@@ -36,7 +36,7 @@ class IntegrationTests extends FlatSpec with Matchers with WebBrowser {
   }
 
 
-  ignore should "estimate profit" in fixture { fx =>
+  it should "estimate profit" in fixture { fx =>
     import fx._
 
     driver.get(host)
@@ -53,7 +53,7 @@ class IntegrationTests extends FlatSpec with Matchers with WebBrowser {
     driver.findElement(By.cssSelector(".form-control:nth-child(12)")).sendKeys("10000")
     driver.findElement(By.cssSelector(".btn")).click()
     Thread.sleep(1000)
-    val elements = driver.findElements(By.xpath("/html/body/app-root/div/div/app-profit-estimation/div/div[2]/div/div[1]/div/div"))
+    val elements = driver.findElements(By.xpath("/html/body/app-root/div/div/app-profit-estimation/div/div[2]/div/div[1]"))
     elements.size() shouldEqual 1
   }
 
