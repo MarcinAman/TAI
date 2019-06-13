@@ -33,6 +33,11 @@ export class ProfitEstimationComponent implements OnInit {
 
   calculateProfit() {
     this.profitEstimationService.estimateProfit(this.profitEstimationData).subscribe(e => {
+
+      if(e.data.estimateProfit.profitPreTax < 0){
+        e.data.estimateProfit.profitPostTax = e.data.estimateProfit.profitPreTax
+      }
+
       this.calculatedProfit = e.data.estimateProfit;
     })
   }

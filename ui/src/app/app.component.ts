@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService, GoogleLoginProvider, SocialUser} from 'angularx-social-login';
 import {operators} from 'rxjs/internal/Rx';
 import {UserService} from './user.service';
@@ -15,32 +15,13 @@ export class AppComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private userService: UserService,
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     this.authService.authState.pipe(operators.flatMap((user) => {
         this.user = user;
-      if(user) {
-        this.userService.currentUser = {
-          firstName: this.user.firstName,
-          lastName: this.user.lastName,
-          email: this.user.email,
-          dashboardCurrencies: []
-        };
-        return this.userService.saveIfNotExistsUser(this.userService.currentUser);
-      } else {
-        return EMPTY
-      }
-    })
-    ).subscribe( x => {
-      this.userService.currentUser = x.data.saveIfNotExistsUser})
-
-  }
-
-  signInWithGoogle(): void {
-    Observable.from(this.authService.signIn(GoogleLoginProvider.PROVIDER_ID)).pipe(operators.flatMap((user) => {
-        this.user = user;
-        if(user) {
+        if (user) {
           this.userService.currentUser = {
             firstName: this.user.firstName,
             lastName: this.user.lastName,
@@ -52,7 +33,34 @@ export class AppComponent implements OnInit {
           return EMPTY
         }
       })
-    ).subscribe( x => {this.userService.currentUser = x.data.saveIfNotExistsUser})
+    ).subscribe(x => {
+      if (x.data) {
+        this.userService.currentUser = x.data.saveIfNotExistsUser
+      }
+    })
+
+  }
+
+  signInWithGoogle(): void {
+    Observable.from(this.authService.signIn(GoogleLoginProvider.PROVIDER_ID)).pipe(operators.flatMap((user) => {
+        this.user = user;
+        if (user) {
+          this.userService.currentUser = {
+            firstName: this.user.firstName,
+            lastName: this.user.lastName,
+            email: this.user.email,
+            dashboardCurrencies: []
+          };
+          return this.userService.saveIfNotExistsUser(this.userService.currentUser);
+        } else {
+          return EMPTY
+        }
+      })
+    ).subscribe(x => {
+      if (x.data) {
+        this.userService.currentUser = x.data.saveIfNotExistsUser
+      }
+    })
 
   }
 
