@@ -4,7 +4,6 @@ import {HttpClient} from '@angular/common/http';
 import {
   ProfitEstimationRequestData,
   ProfitEstimationResponse,
-  ProfitEstimationResponseData
 } from './protfit-estimation.model';
 import {Observable} from 'rxjs';
 import {GraphQLResponse} from '../app.model';

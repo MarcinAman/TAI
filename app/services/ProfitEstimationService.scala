@@ -42,6 +42,10 @@ class ProfitEstimationService @Inject() (private val regressionService: Currency
 
     val profitPreTax = (estimatedFunction.a * endOffset - estimatedFunction.a * beginingOffset) * request.amount
 
-    ProfitEstimationResponse(profitPreTax, profitPreTax * (100 - request.tax) / 100)
+    if(profitPreTax < 0 ){
+      ProfitEstimationResponse(profitPreTax, profitPreTax)
+    } else {
+      ProfitEstimationResponse(profitPreTax, profitPreTax * (100 - request.tax) / 100)
+    }
   }
 }
