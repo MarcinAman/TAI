@@ -94,8 +94,11 @@ export class ChartsComponent implements OnInit {
         currencyName: name.code + " " + name.currencyName,
         currencyCode: name.code
       });
-      this.userService.currentUser.dashboardCurrencies.push(name.code.toString());
-      this.userService.saveUser(this.userService.currentUser).subscribe(() => {})
+
+      if(this.userService.currentUser){
+        this.userService.currentUser.dashboardCurrencies.push(name.code.toString());
+        this.userService.saveUser(this.userService.currentUser).subscribe(() => {})
+      }
     });
   }
 
